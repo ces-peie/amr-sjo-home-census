@@ -1,0 +1,82 @@
+---
+title: "San Juan Ostuncalco home census"
+author: "Oscar"
+date: "August 7, 2017"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+# Load used packages
+library(package = "sf")
+library(package = "leaflet")
+library(package = "tidyverse")
+
+# Configure document knitting
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+```{r read-shapefiles}
+sjo_perimeter <- read_sf("data/shapefiles/sjo_perimeter.shp")
+sjo_blocks <- read_sf("data/shapefiles/sjo_blocks.shp")
+```
+
+
+## Study area
+
+The following interactive map shows in yellow the study area selected in San
+Juan Ostuncalto, and in blue the blocks included in the selected area
+(internet required to present other map elements as roads and labels).
+
+```{r plot-blocks}
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = sjo_perimeter, color = "yellow") %>%
+  addPolygons(data = sjo_blocks, color = "blue")
+```
+
+
+# Select blocks
+
+```{r select-blocks, include=FALSE}
+# Number of selected blocks
+n_blocks <- 2
+
+# Set seed to make selection reproducible
+set.seed(2017-08-07)
+
+# Randomly select n_blocks
+sjo_selected_blocks <- sjo_blocks %>%
+  slice(
+    sample(
+      x = seq(from = 1, to = nrow(.), by = 1),
+      size = n_blocks,
+      replace = FALSE
+    )
+  )
+
+# Save selected blocks as a shapefile
+sjo_selected_blocks %>%
+  st_write(
+    "output/sjo_selected_blocks.shp",
+    delete_dsn = TRUE
+  )
+```
+
+
+Using the blocks shown in the previous map, `r n_blocks` where randomly selected
+to define the home census area. Selected blocks are shown (in red) in the
+following interactive map.
+
+```{r plot-selected-blocks}
+# Plot selected blocks
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = sjo_perimeter, color = "yellow") %>%
+  addPolygons(data = sjo_blocks, color = "blue", opacity = 0.1) %>%
+  addPolygons(data = sjo_selected_blocks, color = "red")
+```
+
+
