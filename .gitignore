@@ -1,0 +1,14 @@
+# Ignore Rstudio project files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Ignore output
+*.html
+*.doc*
+*.pdf
+output/
+
+# Ignore data
+data/
